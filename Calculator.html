@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculator</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css">
+
+    <style type="text/css">
+        body{
+            background-color: #818181;
+        }
+        #calculator{
+            width:300px;
+            height: 410px;
+            margin-top: 10%;
+            margin-right: auto;
+            margin-left: auto;
+            background-color: #dfd8d0;
+            border: 2px solid #908b85;
+            border-radius: 20px;
+            box-shadow: 7px 10px 34px 1px rgba(0,0,0,0.68), inset -1px -6px 12px 0.1px #89847e;
+        }
+        #entrybox{
+            width:80%;
+            height: 65px;
+            margin-right: auto;
+            margin-left: auto;
+            background-color: #c3c2ab;
+            border-radius: 6px;
+            border: 2px solid #b4b39d;
+        }
+        .entry{
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        #buttons{
+            width: 280px;
+            height:auto;
+            margin-left: 15px;
+            margin-top: 15px;
+            display: inline-block;
+            position: absolute;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        button{
+            width:50px;
+            height:40px;
+            margin:0 4px 10px 8px;
+            border: none;
+            border-radius: 8px;
+            background-color: #3a3a3a;
+            box-shadow: 0 3px 0 0 #222121, inset -1px -3px 10px 1px #515151;
+        }
+        button:active{
+            transform: translate(0,3px);
+            box-shadow: none;
+        }
+        #equal-button{
+            height: 90px;
+            margin-top: -50px;
+            margin-left: 12px;
+            position: absolute;
+        }
+        #zero-button{
+            width: 117px;
+        }
+        .red{
+            background-color: #a72d45;
+            box-shadow: 0 3px 0 0 #671c2a;
+        }
+        #footer{
+            margin-top: 40px;
+            font-size: 16px;
+        }
+    </style>
+
+    <script type="text/javascript">
+        // final draft
+        $(document).ready(function() {
+
+            var entry = '';
+            var ans = '';
+            var current = '';
+            var log = '';
+            var decimal = true;
+            var reset = '';
+
+            // round function if answer includes a decimal
+            function round(val) {
+                val = val.toString().split('');
+                if (val.indexOf('.') !== -1) {
+                    var valTest = val.slice(val.indexOf('.') + 1, val.length);
+                    val = val.slice(0, val.indexOf('.') + 1);
+                    var i = 0;
+                    while (valTest[i] < 1) {
+                        i++
+                    }
+                    valTest = valTest.join('').slice(0, i + 2);
+                    if (valTest[valTest.length-1] === '0') {
+                        valTest = valTest.slice(0, -1);
+                    }
+                    return val.join('') + valTest;
+                } else {
+                    return val.join('');
+                }
+            }
+
+            $('button').click(function() {
+
+                entry = $(this).attr("value");
+                console.log('entry: ' + entry);
+
+                //reset for log after answer to equation.
+                if (reset) {
+                    if (entry === '/' || entry === '*' || entry === '-' || entry === '+') {
+                        log = ans;
+                    } else {
+                        ans = '';
+                    }
+                }
+                reset = false;
+
+                // All clear or Clear Entry
+                if (entry === 'ac' || entry === 'ce' && current === 'noChange') {
+                    ans = '';
+                    current = '';
+                    entry = '';
+                    log = '';
+                    $('#history').html('0');
+                    $('#answer').html('0');
+                    decimal = true;
+                } else if (entry === 'ce') {
+                    $('#history').html(log.slice(0, -current.length));
+                    log = log.slice(0, -current.length);
+                    ans = ans.slice(0, -current.length);
+                    current = ans;
+                    if (log.length === 0 || log === ' ') {
+                        $('#history').html('0');
+                    }
+                    $('#answer').html('0');
+                    entry = '';
+                    decimal = true;
+                }
+
+                // prevents more than one deciminal in a number
+                if (entry === '.' || entry === '0.') {
+                    if (!decimal) {
+                        entry = '';
+                    }
+                }
+
+                // prevents improper use of first digit
+                if (ans.length === 0 && isNaN(entry) && entry !== '.' || ans.length === 0 && entry === '0') {
+                    entry = '';
+                    ans = '';
+                }
+
+                // prevents extra operators
+                if (current !== 'noChange') {
+                    if (current === '' && isNaN(entry) && entry !== '.' || isNaN(current) && isNaN(entry) && entry !== '.') {
+                        entry = '';
+                    }
+                }
+
+                // digit combining
+                while (Number(entry) || entry === '0' || current === '.') {
+
+                    if (isNaN(current) && entry === '0' && current !== '.') {
+                        entry = '';
+                    } else if (isNaN(current) && Number(entry) && current !== '.') {
+                        current = '';
+                    }
+                    if (entry === '.') {
+                        decimal = false;
+                    }
+                    if (current === '0.' && isNaN(entry)) {
+                        entry = '';
+                    } else {
+                        if (current[current.length - 1] === '.') {
+                            current = current.concat(entry);
+                        } else {
+                            current += entry;
+                        }
+                        ans += entry;
+                        $('#answer').html(current);
+                        log += entry;
+                        $('#history').html(log);
+                        entry = '';
+                    }
+                }
+
+                // Operation list
+
+                if (entry === '.') {
+                    if (current === '' || isNaN(current[current.length - 1])) {
+                        current = '0.';
+                        ans += entry;
+                        $('#answer').html('0.');
+                        log += current;
+                        $('#history').html(log);
+
+                    } else {
+                        current = current.concat('.');
+                        ans = ans.concat('.');
+                        log = ans;
+                        $('#history').html(ans);
+                        $('#answer').html(current);
+                    }
+                    entry = '';
+                    decimal = false;
+
+                } else if (entry === '/') {
+                    current = '/';
+                    ans = round(eval(ans)) + current;
+                    log += current;
+                    $('#history').html(log);
+                    $('#answer').html('/');
+                    entry = '';
+                    decimal = true;
+
+                } else if (entry === '*') {
+                    current = '*';
+                    ans = round(eval(ans)) + current;
+                    log += 'x';
+                    $('#history').html(log);
+                    $('#answer').html('x');
+                    entry = '';
+                    decimal = true;
+
+                } else if (entry === '-') {
+                    current = '-';
+                    ans = round(eval(ans)) + current;
+                    log += current;
+                    $('#history').html(log);
+                    $('#answer').html('-');
+                    entry = '';
+                    decimal = true;
+
+                } else if (entry === '+') {
+                    current = '+';
+                    ans = round(eval(ans)) + current;
+                    log += current;
+                    $('#history').html(log);
+                    $('#answer').html('+');
+                    entry = '';
+                    decimal = true;
+
+                } else if (entry === '=') {
+                    if (current[current.length - 1] === '.') {
+                        entry = '';
+                    } else {
+                        current = eval(ans).toString();
+                        $('#answer').html(round(eval(ans)));
+                        ans = round(eval(ans));
+                        log += entry + ans;
+                        $('#history').html(log);
+                        log = ans;
+                        entry = '';
+                        reset = true;
+                        decimal = true;
+                    }
+                    current = 'noChange';
+                }
+                entry = '';
+
+                if (reset) {
+                    log = '';
+                }
+
+                // max digits on screen
+                if ($('#entry').children().text().length > 8 || $('#history').text().length > 22) {
+                    $('#answer').html('0');
+                    $('#history').html('Digit Limit Met');
+                    current = '';
+                    ans = '';
+                    log = '';
+                    decimal = true;
+                }
+
+                console.log('decimal: ' + decimal);
+                console.log('current: ' + current);
+                console.log('answer: ' + ans);
+                console.log($('#history').text().length);
+            });
+        }); // end doc ready function
+    </script>
+</head>
+<body>
+<div class="container">
+    <!--title-->
+    <div id="calculator">
+        <div id="title" class="text-center">
+            <h5><b>Electronic Calculator</b></h5>
+        </div>
+
+    <!--entry box-->
+    <div id="entrybox" class="text-right">
+        <div class="entry">
+            <p id="answer">0</p>
+        </div>
+        <div class="entry">
+            <p id="history">0</p>
+        </div>
+    </div>
+
+    <!--buttons-->
+    <div id="buttons">
+        <button class="red" value="ac">AC</button>
+        <button class="red" value="ce">CE</button>
+        <button value="/">&divide;</button>
+        <button value="*">*</button>
+
+        <button value="7">7</button>
+        <button value="8">8</button>
+        <button value="9">9</button>
+        <button value="-">-</button>
+
+        <button value="4">4</button>
+        <button value="5">5</button>
+        <button value="6">6</button>
+        <button value="+">+</button>
+
+        <button value="1">1</button>
+        <button value="2">2</button>
+        <button value="3">3</button>
+        <button class="invisible">N</button>
+
+        <button id="zero-button" value="0">0</button>
+        <button value=".">.</button>
+        <button id="equal-button" value="=">=</button>
+    </div>
+    </div>
+
+
+    <!--footer-->
+    <div id="footer" class="text-center">Follow Free Code Camp simple by zcj </div>
+</div>
+</body>
+</html>
