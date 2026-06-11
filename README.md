@@ -37,3 +37,5 @@ Calculator/
 ## 使用方式
 
 直接用浏览器打开 `index.html` 即可。
+
+在线体验：[https://qianjr2002.github.io/Calculator/](https://qianjr2002.github.io/Calculator/)
