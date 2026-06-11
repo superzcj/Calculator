@@ -1,0 +1,196 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* ===== 计算器主体 ===== */
+.calculator {
+    width: 320px;
+    background: #1c1c1e;
+    border-radius: 24px;
+    padding: 24px 20px 20px;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 1px 0 rgba(255, 255, 255, 0.1) inset;
+}
+
+/* ===== 显示区 ===== */
+.display {
+    background: #1c1c1e;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+.display .expression {
+    color: #8e8e93;
+    font-size: 16px;
+    min-height: 24px;
+    word-break: break-all;
+    text-align: right;
+    transition: color 0.2s;
+    width: 100%;
+}
+
+.display .result {
+    color: #ffffff;
+    font-size: 48px;
+    font-weight: 300;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    word-break: break-all;
+    text-align: right;
+    width: 100%;
+    transition: font-size 0.15s;
+}
+
+.display .result.shrink {
+    font-size: 32px;
+}
+
+/* ===== 按钮网格 ===== */
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+/* ===== 按钮基础样式 ===== */
+button {
+    height: 60px;
+    border: none;
+    border-radius: 50%;
+    font-size: 22px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    outline: none;
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 按下闪光层 */
+button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+button:active::after {
+    opacity: 1;
+    transition: opacity 0s;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+/* ===== 数字按钮 ===== */
+.btn-number {
+    background: #333333;
+    color: #ffffff;
+}
+
+.btn-number:hover {
+    background: #4a4a4a;
+}
+
+/* ===== 运算符按钮 ===== */
+.btn-operator {
+    background: #ff9f0a;
+    color: #ffffff;
+    font-size: 24px;
+}
+
+.btn-operator:hover {
+    background: #ffb340;
+}
+
+.btn-operator.active {
+    background: #ffffff;
+    color: #ff9f0a;
+}
+
+/* ===== 功能按钮 ===== */
+.btn-function {
+    background: #a5a5a5;
+    color: #1c1c1e;
+    font-size: 18px;
+}
+
+.btn-function:hover {
+    background: #c7c7c7;
+}
+
+/* ===== 零按钮占两格 ===== */
+.btn-zero {
+    grid-column: span 2;
+    border-radius: 30px;
+    text-align: left;
+    padding-left: 24px;
+}
+
+/* ===== 底部文字 ===== */
+.footer {
+    text-align: center;
+    color: #8e8e93;
+    margin-top: 24px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    opacity: 0.7;
+}
+
+/* ===== 波纹动画 ===== */
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0);
+    animation: ripple 0.5s ease-out;
+    pointer-events: none;
+}
+
+/* ===== 键盘提示 ===== */
+.keyboard-hint {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #8e8e93;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    backdrop-filter: blur(10px);
+    letter-spacing: 0.5px;
+    pointer-events: none;
+}
